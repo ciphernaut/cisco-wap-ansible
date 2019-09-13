@@ -1,0 +1,5 @@
+*.pyc
+playbooks/ap/backup/
+**/roles/
+!/roles
+inventory/group_vars/ios.yml

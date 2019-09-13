@@ -1,0 +1,22 @@
+- hosts: ap2
+  gather_facts: no
+  remote_user: cisco
+  connection: network_cli
+  become_method: enable
+
+  tasks:
+  - set_fact:
+      provider:
+        username: cisco
+        password: Cisco
+        auth_pass: Cisco
+        host: "{{ inventory_hostname }}"
+        become_method: enable
+        network_os: ios
+
+  - ios_config:
+      provider: "{{ provider }}"
+      lines:
+      - hostname {{ inventory_hostname }}
+      - enable secret 0 {{ ansible_become_password_a }}
+      - username ansible password 0 {{ ansible_password_a }}

@@ -1,0 +1,43 @@
+- hosts: ap
+
+  vars:
+    Dot11RadioPowerLevel: "2"
+    Dot11RadioPowerRange:
+      - '17'
+      - '14'
+      - '11'
+      - '8'
+      - '5'
+      - '2'
+      - '-1'
+      - 'Max'
+
+  tasks:
+  - name: debug power level
+    debug:
+      var: Dot11RadioPowerLevel
+
+  - name: set power level 2.4 GHz
+    ios_config:
+      lines:
+      - power local {{ Dot11RadioPowerLevel }}
+      - power client {{ Dot11RadioPowerLevel }}
+      parents:
+      - interface Dot11Radio0
+    when:
+      - Dot11RadioPowerLevel in Dot11RadioPowerRange
+
+  - name: set power level 5 GHz
+    ios_config:
+      lines:
+      - power local {{ Dot11RadioPowerLevel }}
+      - power client {{ Dot11RadioPowerLevel }}
+      parents:
+      - interface Dot11Radio1
+    when:
+      - Dot11RadioPowerLevel in Dot11RadioPowerRange
+      - has_5g_radio
+
+  - name: save running to startup when modified
+    ios_config:
+      save_when: modified

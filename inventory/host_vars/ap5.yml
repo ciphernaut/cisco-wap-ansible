@@ -1,0 +1,2 @@
+ansible_host: 10.0.0.130
+has_5g_radio: 1

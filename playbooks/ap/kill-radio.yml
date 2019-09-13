@@ -1,0 +1,30 @@
+- hosts: ap
+
+  tasks:
+# - name: kill radio - 2.4
+#   ios_config:
+#     lines:
+#     - shutdown
+#     parents: 
+#     - interface Dot11Radio 0
+#     - interface Dot11Radio 1
+
+  - name: make interface down 5GHz
+    ios_interface:
+      name: Dot11Radio1
+      enabled: False
+    when:
+    - has_5g_radio
+    tags:
+    - 80211a
+
+  - name: make interface down 2.4GHz
+    ios_interface:
+      name: Dot11Radio0
+      enabled: False
+    tags:
+    - 80211b
+
+# - name: save running to startup when modified
+#   ios_config:
+#     save_when: modified
