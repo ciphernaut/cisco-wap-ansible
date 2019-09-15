@@ -18,8 +18,10 @@
     ios_user:
       name: ansible
       nopassword: True
+      privilege: 15
       sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
       state: present
+
 
 
       #  - ios_config:
