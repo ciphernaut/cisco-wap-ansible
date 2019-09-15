@@ -14,9 +14,17 @@
         become_method: enable
         network_os: ios
 
-  - ios_config:
-      provider: "{{ provider }}"
-      lines:
-      - hostname {{ inventory_hostname }}
-      - enable secret 0 {{ ansible_become_password_a }}
-      - username ansible password 0 {{ ansible_password_a }}
+  - name: create a new user
+    ios_user:
+      name: ansible
+      nopassword: True
+      sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+      state: present
+
+
+      #  - ios_config:
+      #provider: "{{ provider }}"
+      #lines:
+      #- hostname {{ inventory_hostname }}
+      #- enable secret 0 {{ ansible_become_password_a }}
+      #- username ansible password 0 {{ ansible_password_a }}
