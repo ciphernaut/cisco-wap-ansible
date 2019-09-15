@@ -1,0 +1,16 @@
+- hosts: ap2
+
+  roles:
+  - ansible-filter-cisco-hash
+
+  tasks:
+  - name: update ssid configuration
+    ios_config:
+      lines:
+        - authentication open
+        - authentication key-management wpa version 2
+        - guest-mode
+        - wpa-psk ascii 7 {{ ssid_password|ciscohash7 }}
+      parents:
+        - dot11 ssid {{ ssid_ssid_name }}
+      save_when: modified
