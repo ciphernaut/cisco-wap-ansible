@@ -1,4 +1,4 @@
-- hosts: ap2
+- hosts: ios
 
   roles:
   - ansible-filter-cisco-hash
@@ -10,7 +10,7 @@
         - authentication open
         - authentication key-management wpa version 2
         - guest-mode
-        - wpa-psk ascii 7 {{ ssid_password|ciscohash7 }}
+        - wpa-psk ascii 7 {{ssid_password|ciscohash7( 52 | random(seed=inventory_hostname))}}
       parents:
-        - dot11 ssid {{ ssid_ssid_name }}
+        - "dot11 ssid {{ ssid_ssid_name }}"
       save_when: modified
