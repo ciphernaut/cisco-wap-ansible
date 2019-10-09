@@ -1,0 +1,32 @@
+- hosts: localhost
+  #  requires this playbook to be in the same directory the target playbooks
+  #  run with '-e disable_cron=yes' to disable
+
+  tasks:
+# - debug:
+#     var: ansible_inventory_sources
+
+
+  - name: set cron variables
+    cron:
+      env: yes
+      name: ANSIBLE_INVENTORY
+      job: "{{ ansible_inventory_sources |join(', ') }}"
+
+  - name: setup cron job for user to enable radios
+    cron:
+      user: "{{ ansible_user_id }}"
+      hour: 23
+      minute: 30
+      name: "enable WAP radios"
+      job: "/usr/bin/ansible-playbook {{ playbook_dir }}/enable-radio.yml"
+      disabled: "{{ disable_cron | default('no') }}"
+
+  - name: setup cron job for user to disable radios
+    cron:
+      user: "{{ ansible_user_id }}"
+      hour: 10
+      minute: 54
+      name: "disable WAP radios"
+      job: "/usr/bin/ansible-playbook {{ playbook_dir }}/kill-radio.yml"
+      disabled: "{{ disable_cron | default('no') }}"
