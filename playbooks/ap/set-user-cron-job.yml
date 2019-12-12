@@ -11,12 +11,12 @@
     cron:
       env: yes
       name: ANSIBLE_INVENTORY
-      job: "{{ ansible_inventory_sources |join(', ') }}"
+      job: "{{ ansible_inventory_sources |join(':') }}"
 
   - name: setup cron job for user to enable radios
     cron:
       user: "{{ ansible_user_id }}"
-      hour: 23
+      hour: 5
       minute: 30
       name: "enable WAP radios"
       job: "/usr/bin/ansible-playbook {{ playbook_dir }}/enable-radio.yml"
@@ -25,8 +25,8 @@
   - name: setup cron job for user to disable radios
     cron:
       user: "{{ ansible_user_id }}"
-      hour: 10
-      minute: 54
+      hour: 23
+      minute: 30
       name: "disable WAP radios"
       job: "/usr/bin/ansible-playbook {{ playbook_dir }}/kill-radio.yml"
       disabled: "{{ disable_cron | default('no') }}"
