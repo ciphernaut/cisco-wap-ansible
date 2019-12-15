@@ -36,7 +36,7 @@
       - interface Dot11Radio1
     when:
       - Dot11RadioPowerLevel in Dot11RadioPowerRange
-      - has_5g_radio
+      - has_5g_radio|bool
 
   - name: save running to startup when modified
     ios_config:

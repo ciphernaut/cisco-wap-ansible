@@ -1,0 +1,69 @@
+- hosts: ap
+
+  roles:
+  - ansible-filter-cisco-hash
+
+  handlers:
+  - name: save configuration
+    ios_config:
+      save_when: modified
+
+  tasks:
+  - name: set time
+    ios_command:
+      commands:
+        - "clock set {{ansible_date_time.time}} {{lookup('pipe', 'date +%b')}} {{ansible_date_time.day}} {{ansible_date_time.year}}"
+
+  - name: set some system parameters
+    ios_config:
+      lines:
+      - hostname {{ inventory_hostname }}
+      - "clock timezone {{ansible_date_time.tz_offset}} {{(ansible_date_time.tz_offset|int/100)|string|replace('.0', '')}} 0"
+      - dot11 network-map
+      - sntp server {{ ios_ntp_upstream }}
+    notify: save configuration
+
+  - name: update ssid configuration
+    ios_config:
+      lines:
+        - authentication open
+        - authentication key-management wpa version 2
+        - guest-mode
+        - wpa-psk ascii 7 {{ssid_password|ciscohash7( 52 | random(seed=inventory_hostname))}}
+      parents:
+        - "dot11 ssid {{ ssid_ssid_name }}"
+    notify: save configuration
+
+  - name: update interface configuration
+    ios_config:
+      lines:
+        - encryption mode ciphers aes-ccm
+        - "ssid {{ ssid_ssid_name }}"
+        - station-role root bridge wireless-clients
+        - dot11 dot11r pre-authentication over-air
+        - world-mode dot11d country-code AU both
+        - no shutdown
+      parents:
+        - interface Dot11Radio0
+    notify: save configuration
+
+  - name: update interface configuration 5G
+    ios_config:
+      lines:
+        - encryption mode ciphers aes-ccm
+        - "ssid {{ ssid_ssid_name }}"
+        - station-role root bridge wireless-clients
+        - dot11 dot11r pre-authentication over-air
+        - world-mode dot11d country-code AU both
+        - no shutdown
+      parents:
+        - interface Dot11Radio1
+    notify: save configuration
+    when:
+    - has_5g_radio|bool
+
+  - name: set time
+    ios_command:
+      commands:
+        - "clock set {{ansible_date_time.time}} {{lookup('pipe', 'date +%b')}} {{ansible_date_time.day}} {{ansible_date_time.year}}"
+

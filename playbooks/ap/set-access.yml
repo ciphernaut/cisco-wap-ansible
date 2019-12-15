@@ -1,14 +1,11 @@
   # prerequisite: enable sshd service on AP
+  # for followup run (after some access parameters have already been modified):
+  #   playbooks/ap/set-access.yml -e followup_run_bs=true
 
 - hosts: ap
   gather_facts: no
   connection: network_cli
   become_method: enable
-
-  vars:
-    ansible_user: cisco
-    ansible_password: Cisco
-    ansible_become_password: Cisco
 
   handlers:
   - name: save configuration
@@ -19,6 +16,9 @@
   - ansible-filter-cisco-hash
 
   tasks:
+  - include_vars: bootstrap-vars.yml
+    when: not followup_run_bs
+
   - name: create the ansible user
     ios_user:
       name: ansible
@@ -33,16 +33,15 @@
       state: present
     notify: save configuration
 
-
-
-  - name: set hostname and update enable password
+  - name: set hostname, update enable password, deconfigure telnet
     ios_config:
       lines:
       - hostname {{ inventory_hostname }}
       - enable secret 5 {{ ansible_become_password_a| password_hash('md5', 9 | random(seed=inventory_hostname) | string ) }}
+      - no access-list 111
     notify: save configuration
 
-  - name: update the cisco user
+  - name: update cisco user access
     ios_user:
       name: cisco
       hashed_password:
