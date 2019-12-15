@@ -14,7 +14,7 @@
       name: Dot11Radio1
       enabled: False
     when:
-    - has_5g_radio
+    - has_5g_radio|bool
     tags:
     - 80211a
 
