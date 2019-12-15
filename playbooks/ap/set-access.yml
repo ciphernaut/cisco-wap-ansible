@@ -19,6 +19,19 @@
   - include_vars: bootstrap-vars.yml
     when: not followup_run_bs
 
+  - name: assert all variables needed are set
+    assert:
+      that: "{{ item }} is defined"
+      fail_msg: "some missing variables need defining"
+      quiet: yes
+    with_items:
+        - ansible_password_a
+        - ansible_become_password_a
+        - ansible_user
+        - ansible_password
+        - ansible_become_password
+        - ansible_become_method
+
   - name: create the ansible user
     ios_user:
       name: ansible

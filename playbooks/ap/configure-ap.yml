@@ -9,6 +9,17 @@
       save_when: modified
 
   tasks:
+  - name: assert all variables needed are set
+    assert:
+      that: "{{ item }} is defined"
+      fail_msg: "some missing variables need defining"
+      quiet: yes
+    with_items:
+        - ios_ntp_upstream
+        - ssid_ssid_name
+        - ssid_password
+        - has_5g_radio
+
   - name: set time
     ios_command:
       commands:
@@ -61,9 +72,3 @@
     notify: save configuration
     when:
     - has_5g_radio|bool
-
-  - name: set time
-    ios_command:
-      commands:
-        - "clock set {{ansible_date_time.time}} {{lookup('pipe', 'date +%b')}} {{ansible_date_time.day}} {{ansible_date_time.year}}"
-
