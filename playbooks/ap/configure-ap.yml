@@ -1,5 +1,9 @@
-- hosts: ap
+- hosts: localhost
+  tasks: []
+  # collect facts from playbook host, needed for ansible_date_time
+  # this assumes the playbook host is configured correctly TZ/time/date-wise
 
+- hosts: ap
   roles:
   - ansible-filter-cisco-hash
 
@@ -23,13 +27,14 @@
   - name: set time
     ios_command:
       commands:
-        - "clock set {{ansible_date_time.time}} {{lookup('pipe', 'date +%b')}} {{ansible_date_time.day}} {{ansible_date_time.year}}"
+      - "clock set {{hostvars['localhost']['ansible_date_time']['time']}} {{lookup('pipe', 'date +%b')}} {{hostvars['localhost']['ansible_date_time']['day']}} {{hostvars['localhost']['ansible_date_time']['year']}}"
+
 
   - name: set some system parameters
     ios_config:
       lines:
       - hostname {{ inventory_hostname }}
-      - "clock timezone {{ansible_date_time.tz_offset}} {{(ansible_date_time.tz_offset|int/100)|string|replace('.0', '')}} 0"
+      - "clock timezone {{hostvars['localhost']['ansible_date_time']['tz_offset']}} {{(hostvars['localhost']['ansible_date_time']['tz_offset']|int/100)|string|replace('.0', '')}} 0"
       - dot11 network-map
       - sntp server {{ ios_ntp_upstream }}
     notify: save configuration
