@@ -1,14 +1,6 @@
 - hosts: ios
 
   tasks:
-# - name: kill radio - 2.4
-#   ios_config:
-#     lines:
-#     - shutdown
-#     parents: 
-#     - interface Dot11Radio 0
-#     - interface Dot11Radio 1
-
   - name: make interface up 5GHz
     ios_interface:
       name: Dot11Radio1
@@ -28,3 +20,5 @@
   - name: save running to startup when modified
     ios_config:
       save_when: modified
+    # Save system config with default radios enabled.
+    # This is to mitigate against an unintended system state save after radios were shut down
