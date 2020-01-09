@@ -1,3 +1,7 @@
+Ansible Cisco WAP
+=================
+
+A set of playbooks for setting up and maintaining a fleet of Cisco wireless access points.
 
 
 
